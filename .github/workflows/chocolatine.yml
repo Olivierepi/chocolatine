@@ -39,7 +39,6 @@ jobs:
     timeout-minutes: 2
     container:
       image: epitechcontent/epitest-docker:latest
-
     steps:
       - uses: actions/checkout@v3
         with:
@@ -54,7 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker:latest
-
     steps:
       - uses: actions/checkout@v3
       - run: make tests_run
@@ -64,7 +62,6 @@ jobs:
     needs : run_tests
     on: push
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
         with:
