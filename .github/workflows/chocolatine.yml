@@ -41,12 +41,10 @@ jobs:
       image: epitechcontent/epitest-docker:latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - run: make
         timeout-minutes: 2
-      - run: make clean
-      - run: echo -ne "ls" | ./$EXECUTABLES
+        run: make clean
+        run: echo -ne "ls" | ./$EXECUTABLES
 
   run_tests:
     needs : check_program_compilation
