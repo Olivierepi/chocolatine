@@ -44,7 +44,10 @@ jobs:
       - run: make
         timeout-minutes: 2
       - run: make clean
-      - run: echo -ne "ls" | ./$EXECUTABLES
+      - run: |
+            for BINARY in $EXECUTABLES; do
+              ./$BINARY && echo "$BINARY SUCCESSFULY EXIST IN THIS REPO"
+            done
 
   run_tests:
     needs : check_program_compilation
