@@ -60,7 +60,6 @@ jobs:
 
   push_to_mirror:
     needs : run_tests
-    on: push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
