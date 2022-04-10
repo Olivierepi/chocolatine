@@ -1,0 +1,60 @@
+name: Mirroring
+
+on: [push, delete]
+
+jobs:
+  check_repository_cleanliness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+            TMP_FILES=$(find . -type f -name "*.o" -o -name "*.a" -o -name "*.gcno" -o -name "*.gdca" -o -name "*~" -o -name "#*#" -o -name "*.pyc" -o -name "*pain_au_chocolat*" -o -name "*.so" -o -name "*.gcov")
+            for FILES in $TMP_FILES; do
+              echo ::error name=error::"Unwanted file detected: ${FILES#./}"
+            done
+            TMP_DIR=$(find . -type d -name "__pycache__" -o -name "node_modules" -o -name "tmp")
+            for DIR in $TMP_DIR; do
+              echo ::error name=error::"Unwanted directory detected: ${DIR#./}"
+            done
+            for FILES in $TMP_FILES; do
+              exit 1
+            done
+            for DIR in $TMP_DIR; do
+              exit 1
+            done
+  check_program_compilation:
+    needs : check_repository_cleanliness
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    container:
+      image: epitechcontent/epitest-docker
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: make
+      - run: echo -ne "ls" | ./mysh
+  run_tests:
+    needs : check_program_compilation
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    container:
+      image: epitechcontent/epitest-docker
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - run: make tests_run
+  push_to_mirror:
+    needs : run_tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: pixta-dev/repository-mirroring-action@v1
+        with:
+          target_repo_url:
+            git@github.com:EpitechPromo2026/B-DOP-200-MPL-2-1-bschocolatine-olivier.reynaud.git
+          ssh_private_key:
+            ${{ secrets.GIT_SSH_PRIVATE_KEY }}
